@@ -1,0 +1,29 @@
+
+# =================================
+# BHRAM - SAMPLE URL TEST DATA
+# =================================
+
+# Safe test examples (reserved example domains)
+
+https://example.com
+https://www.example.com
+https://example.org
+https://example.net
+https://example.com/about
+https://example.org/contact
+https://example.net/products
+https://example.com/login
+https://example.org/help
+https://example.net/services
+
+# Suspicious-looking synthetic examples (defanged)
+
+hxxps://esewa-login[.]invalid
+hxxps://esewaa[.]invalid
+hxxps://khalti-secure[.]invalid
+hxxps://khalti-verify[.]invalid
+hxxps://ntc-account-update[.]invalid
+hxxps://ncell-free-data[.]invalid
+hxxps://nabilbank-login[.]invalid
+hxxps://globalime-secure[.]invalid
+hxxps://bank-verify[.]invalid
