@@ -1,0 +1,69 @@
+
+{
+  "esewa": [
+    "https://esewa.com.np"
+  ],
+  "khalti": [
+    "https://khalti.com"
+  ],
+  "nepal_telecom": [
+    "https://www.ntc.net.np"
+  ],
+  "ncell": [
+    "https://www.ncell.com.np"
+  ],
+  "banks": {
+    "nabil_bank": [
+      "https://www.nabilbank.com"
+    ],
+    "global_ime_bank": [
+        "https://www.globalimebank.com"
+    ],
+    "nic_asia_bank": [
+        "https://www.nicasiabank.com"
+    ],
+    "nepal_sbi_bank": [
+        "https://nsbl.statebank"
+    ],
+    "himalayan_bank": [
+        "https://himalayanbank.com"
+    ],
+    "kumari_bank": [
+        "https://www.kumaribank.com"
+    ],
+    "nmb_bank": [
+        "https://www.nmb.com.np"
+    ],
+    "sanima_bank": [
+        "https://www.sanimabank.com"
+    ],
+    "nepal_bank": [
+        "https://nepalbank.com.np"
+    ],
+    "rastriya_banijya_bank": [
+        "https://rbb.com.np"
+    ],
+    "everest_bank": [
+        "https://everestbankltd.com"
+    ],
+    "machhapuchhre_bank": [
+        "https://www.machbank.com"
+    ],
+    "prime_bank": [
+        "https://www.primebank.com.np"
+    ],
+    "siddhartha_bank": [
+        "https://www.siddharthabank.com"
+    ],
+    "laxmi_sunrise_bank": [
+        "https://www.laxmisunrise.com"
+    ],
+    "prabhu_bank": [
+        "https://www.prabhubank.com"
+    ],
+    "agricultural_development_bank": [
+        "https://adbl.gov.np"
+    ]
+  }
+}
+
