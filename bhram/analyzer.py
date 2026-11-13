@@ -3,58 +3,58 @@ from urllib.parse import urlsplit
 
 
 def analyze_url(url):
-    """
-    Normalize and parse a URL.
-    Returns basic URL information or an error.
-    """
+    url = url.strip()
 
-    original_url = url.strip()
-
-    if not original_url:
+    # Check if the input is empty
+    if not url:
         return {
             "is_valid": False,
-            "error": "URL cannot be empty."
+            "error": "Please enter a URL."
         }
 
-    # Add HTTPS when the user does not provide a scheme.
-    if "://" not in original_url:
-        normalized_url = "https://" + original_url
-    else:
-        normalized_url = original_url
+    # Add https if the user doesn't provide a protocol
+    if "://" not in url:
+        url = "https://" + url
 
-    # Reject whitespace inside the URL.
-    if any(char.isspace() for char in normalized_url):
+    # Check for spaces inside the URL
+    if any(char.isspace() for char in url):
         return {
             "is_valid": False,
-            "error": "URL must not contain spaces."
+            "error": "URL cannot contain spaces."
         }
 
     try:
-        parsed = urlsplit(normalized_url)
+        parts = urlsplit(url)
+        _ = parts.port
 
-        # Accessing .port also checks whether a supplied port is valid.
-        _ = parsed.port
-
-        if parsed.scheme not in ("http", "https"):
+        if parts.scheme not in ["http", "https"]:
             return {
                 "is_valid": False,
-                "error": "Only HTTP and HTTPS URLs are supported."
+                "error": "Only HTTP and HTTPS are supported."
             }
 
-        if not parsed.hostname:
+        if not parts.hostname:
             return {
                 "is_valid": False,
-                "error": "URL must contain a valid hostname."
+                "error": "URL must contain a hostname."
+            }
+
+        # Check if the hostname looks like a proper domain
+        domain_parts = parts.hostname.split(".")
+
+        if len(domain_parts) < 2 or any(not part for part in domain_parts):
+            return {
+                "is_valid": False,
+                "error": "Please enter a valid domain name."
             }
 
         return {
             "is_valid": True,
-            "original_url": original_url,
-            "normalized_url": normalized_url,
-            "scheme": parsed.scheme,
-            "hostname": parsed.hostname.lower(),
-            "path": parsed.path,
-            "query": parsed.query
+            "url": url,
+            "scheme": parts.scheme,
+            "hostname": parts.hostname.lower(),
+            "path": parts.path,
+            "query": parts.query
         }
 
     except ValueError:
