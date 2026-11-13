@@ -13,6 +13,9 @@
     "https://www.ncell.com.np"
   ],
   "banks": {
+    "nepal_rastra_bank": [
+        "https://www.nrb.org.np"
+    ],
     "nabil_bank": [
       "https://www.nabilbank.com"
     ],
@@ -63,6 +66,12 @@
     ],
     "agricultural_development_bank": [
         "https://adbl.gov.np"
+    ],
+    "nepal_investment_mega_bank": [
+        "https://www.nimb.com.np"
+    ],
+    "standard_chartered_bank": [
+        "https://www.sc.com/np/"
     ]
   }
 }
