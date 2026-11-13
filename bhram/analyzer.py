@@ -1,8 +1,15 @@
-
+import ipaddress
 from urllib.parse import urlsplit
 
 
 def analyze_url(url):
+    # Check the input
+    if not isinstance(url, str):
+        return {
+            "is_valid": False,
+            "error": "URL must be text."
+        }
+
     url = url.strip()
 
     # Check if the input is empty
@@ -39,14 +46,24 @@ def analyze_url(url):
                 "error": "URL must contain a hostname."
             }
 
-        # Check if the hostname looks like a proper domain
-        domain_parts = parts.hostname.split(".")
+        hostname = parts.hostname.lower()
 
-        if len(domain_parts) < 2 or any(not part for part in domain_parts):
-            return {
-                "is_valid": False,
-                "error": "Please enter a valid domain name."
-            }
+          # Check whether the hostname is an IP address
+        try:
+            ipaddress.ip_address(hostname)
+            is_ip = True
+        except ValueError:
+            is_ip = False
+
+        # Check domain format only if it is not an IP address
+        if not is_ip:
+            domain_parts = hostname.split(".")
+
+            if len(domain_parts) < 2 or any(not part for part in domain_parts):
+                return {
+                    "is_valid": False,
+                    "error": "Please enter a valid domain name."
+                }
 
         return {
             "is_valid": True,

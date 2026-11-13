@@ -1,0 +1,43 @@
+
+import ipaddress
+from urllib.parse import urlsplit
+
+
+def check_url_structure(url_info):
+    warnings = []
+
+    url = url_info["url"]
+    hostname = url_info["hostname"]
+
+    parts = urlsplit(url)
+
+    # Check if the hostname is an IP address
+    try:
+        ipaddress.ip_address(hostname)
+
+        warnings.append(
+            "The URL uses an IP address instead of a domain name."
+        )
+
+    except ValueError:
+        # Check for too many domain parts
+        domain_parts = hostname.split(".")
+
+        if len(domain_parts) > 4:
+            warnings.append(
+                "The URL contains an unusually large number of domain parts."
+            )
+
+    # Check for @ symbol in the address
+    if "@" in parts.netloc:
+        warnings.append(
+            "The URL contains an @ symbol in its address."
+        )
+
+    # Check if the URL is unusually long
+    if len(url) > 100:
+        warnings.append(
+            "The URL is unusually long."
+        )
+
+    return warnings
