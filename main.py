@@ -1,5 +1,6 @@
 from bhram.analyzer import analyze_url
 from bhram.rules import check_url_structure
+from bhram.scorer import calculate_risk
 
 def main():
     print("=" * 40)
@@ -22,6 +23,8 @@ def main():
 
     warnings = check_url_structure(result)
 
+    risk = calculate_risk(warnings)
+
     print("\nSecurity Checks")
     print("-" * 40)
 
@@ -31,7 +34,10 @@ def main():
     else:
         print("No suspicious URL structures found.")
 
-    print("\nAnalysis completed.")
+    print("\nRisk Assessment")
+    print("-" * 40)
+    print("Risk Score :", str(risk["score"]) + "/100")
+    print("Risk Level :", risk["level"])
 
 if __name__ == "__main__":
     main()
