@@ -1,6 +1,5 @@
-
 from bhram.analyzer import analyze_url
-
+from bhram.rules import check_url_structure
 
 def main():
     print("=" * 40)
@@ -18,13 +17,21 @@ def main():
 
     print("\nURL Analysis Result")
     print("-" * 40)
-
-    print("URL      :", result["url"])
     print("Protocol :", result["scheme"])
     print("Hostname :", result["hostname"])
-    print("Path     :", result["path"])
-    print("Query    :", result["query"])
 
+    warnings = check_url_structure(result)
+
+    print("\nSecurity Checks")
+    print("-" * 40)
+
+    if warnings:
+        for warning in warnings:
+            print("[!]", warning)
+    else:
+        print("No suspicious URL structures found.")
+
+    print("\nAnalysis completed.")
 
 if __name__ == "__main__":
     main()
