@@ -1,29 +1,102 @@
 
-# =================================
-# BHRAM - SAMPLE URL TEST DATA
-# =================================
+# Bhram - sample URLs for testing
+#
+# Format: EXPECTED | URL
+# EXPECTED = LOW, MEDIUM or HIGH
+# These labels are initial guesses. Review them after testing
+# and adjusting the scoring rules.
+#
+# Lines starting with # are comments.
+# Blank lines are ignored.
+#
+# SAFETY:
+# - Suspicious examples are fictional and defanged.
+# - Refang before analysis: hxxp -> http, [.] -> .
+# - Never open suspicious examples in a browser.
+# - Never add real phishing links without defanging them first.
+# - 192.0.2.x is a reserved documentation IP range (RFC 5737).
+# - Verify provider domains from official sources before trusting them.
+# - HTTPS does not automatically mean a website is safe.
+#
+# ---------- GENERAL TEST DOMAINS ----------
+# Reserved domains for testing. These are not trusted providers.
 
-# Safe test examples (reserved example domains)
+LOW | https://example.com
+LOW | https://example.org
+LOW | https://example.net
 
-https://example.com
-https://www.example.com
-https://example.org
-https://example.net
-https://example.com/about
-https://example.org/contact
-https://example.net/products
-https://example.com/login
-https://example.org/help
-https://example.net/services
+# ---------- NEPALI PAYMENT WALLETS ----------
 
-# Suspicious-looking synthetic examples (defanged)
+LOW | https://esewa.com.np
+LOW | https://www.esewa.com.np
+LOW | https://khalti.com
+LOW | https://www.khalti.com
 
-hxxps://esewa-login[.]invalid
-hxxps://esewaa[.]invalid
-hxxps://khalti-secure[.]invalid
-hxxps://khalti-verify[.]invalid
-hxxps://ntc-account-update[.]invalid
-hxxps://ncell-free-data[.]invalid
-hxxps://nabilbank-login[.]invalid
-hxxps://globalime-secure[.]invalid
-hxxps://bank-verify[.]invalid
+# ---------- NEPALI BANKING ----------
+
+LOW | https://www.nabilbank.com
+LOW | https://www.nrb.org.np
+
+# ---------- TELECOM ----------
+
+LOW | https://www.ntc.net.np
+LOW | https://www.ncell.com.np
+
+# ---------- LOOKALIKE DOMAINS / TYPOS ----------
+
+HIGH | hxxps://esewa-login[.]com
+HIGH | hxxps://kha1ti[.]com
+MEDIUM | hxxps://esewaa[.]com[.]np
+HIGH | hxxp://globalime-bank[.]online/verify-account
+HIGH | hxxps://ncelll[.]com[.]np
+HIGH | hxxps://nabil-bank-login[.]com
+
+# ---------- BRAND NAME USED AS A DECOY ----------
+
+HIGH | hxxps://esewa[.]account-verify[.]top
+HIGH | hxxps://khalti[.]secure-login[.]xyz
+HIGH | hxxps://secure[.]ntc[.]net[.]np[.]verify-sim[.]xyz/bonus
+HIGH | hxxps://nabilbank[.]com@secure-update[.]top/login
+HIGH | hxxps://ncell[.]bonus-claim[.]online
+
+# ---------- SUSPICIOUS KEYWORDS ----------
+
+MEDIUM | hxxps://example[.]com/verify-account
+MEDIUM | hxxps://example[.]com/login/update
+MEDIUM | hxxps://example[.]com/account/secure
+HIGH | hxxps://example[.]top/claim-free-bonus
+HIGH | hxxps://example[.]xyz/urgent-account-verification
+
+# ---------- URL STRUCTURE ----------
+
+HIGH | hxxp://192[.]0[.]2[.]10/esewa/verify
+HIGH | hxxps://192[.]0[.]2[.]25/login
+MEDIUM | hxxps://login[.]bank[.]example[.]com
+HIGH | hxxps://example[.]com@192[.]0[.]2[.]10/login
+MEDIUM | hxxps://example[.]com/long/path/account/verification
+
+# ---------- HTTP / HTTPS ----------
+
+MEDIUM | hxxp://example[.]com/login
+LOW | https://example.com/about
+
+# ---------- SUSPICIOUS TLDs ----------
+
+MEDIUM | hxxps://example[.]xyz
+MEDIUM | hxxps://example[.]top/login
+MEDIUM | hxxps://example[.]online/verify
+
+# ---------- SHORTENED URLS ----------
+
+MEDIUM | hxxps://bit[.]ly/3AbCdEf
+MEDIUM | hxxps://tinyurl[.]com/example
+
+# ---------- PUNYCODE ----------
+
+MEDIUM | hxxps://xn--bcher-kva[.]example
+
+# ---------- EDGE CASES ----------
+
+MEDIUM | example.com
+MEDIUM | hxxps://example[.]com:8080/login
+HIGH | hxxps://esewa-login[.]com/verify?account=12345
