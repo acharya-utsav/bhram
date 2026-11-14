@@ -4,13 +4,15 @@ def calculate_risk(warnings):
     # Points for each detected warning
     risk_points = {
         "The URL uses an IP address instead of a domain name.": 40,
+        "The domain may be impersonating a trusted website.": 30,
         "The URL contains an @ symbol in its address.": 25,
         "The URL contains an unusually large number of domain parts.": 20,
         "The URL is unusually long.": 10,
-        "The URL contains suspicious keywords often used in phishing attempts.": 10
+        "The URL contains suspicious keywords often used in phishing attempts.": 10,
+        "URL uses HTTP instead of HTTPS.": 10,
     }
 
-    for warning in warnings:
+    for warning in set(warnings):
         score += risk_points.get(warning, 0)
 
     # Keep the score within 0 to 100

@@ -65,6 +65,39 @@ def analyze_url(url):
                     "error": "Please enter a valid domain name."
                 }
 
+            # Check for invalid numeric IP addresses
+            if all(part.isdigit() for part in domain_parts):
+                return {
+                    "is_valid": False,
+                    "error": "Please enter a valid domain name."
+                }
+
+            # Check domain length
+            if len(hostname) > 253:
+                return {
+                    "is_valid": False,
+                    "error": "Domain name is too long."
+                }
+
+            # Check each domain label
+            for part in domain_parts:
+                if len(part) > 63:
+                    return {
+                        "is_valid": False,
+                        "error": "Domain label is too long."
+                    }
+
+                if (
+                    not part.isascii()
+                    or not all(char.isalnum() or char == "-" for char in part)
+                    or part.startswith("-")
+                    or part.endswith("-")
+                ):
+                    return {
+                        "is_valid": False,
+                        "error": "Please enter a valid domain name."
+                    }
+
         return {
             "is_valid": True,
             "url": url,

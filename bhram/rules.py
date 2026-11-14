@@ -1,7 +1,55 @@
-
 import ipaddress
+import json
+from difflib import SequenceMatcher
 from urllib.parse import urlsplit
+from functools import lru_cache
 
+
+@lru_cache(maxsize=1)
+def load_trusted_domains():
+    # Load trusted domains from the JSON file
+    try:
+        with open("data/trusted_domains.json", "r") as file:
+            trusted_data = json.load(file)
+
+    except FileNotFoundError:
+        print("Error: Trusted domains file was not found.")
+        return []
+
+    except json.JSONDecodeError:
+        print("Error: Trusted domains JSON file is invalid.")
+        return []
+
+    except OSError as error:
+        print("Error loading trusted domains:", error)
+        return []
+
+    trusted_hosts = []
+
+    # Collect domains from the JSON file
+    def collect_domains(data):
+        for value in data.values():
+            if isinstance(value, list):
+                for url in value:
+                    if not isinstance(url, str):
+                        continue
+
+                    trusted_url = urlsplit(url)
+
+                    if trusted_url.hostname:
+                        trusted_hosts.append(
+                            trusted_url.hostname.lower()
+                        )
+
+            elif isinstance(value, dict):
+                collect_domains(value)
+
+    if not isinstance(trusted_data, dict):
+        return []
+
+    collect_domains(trusted_data)
+
+    return trusted_hosts
 
 def check_url_structure(url_info):
     warnings = []
@@ -63,3 +111,94 @@ def check_suspicious_keywords(url_info):
             break
 
     return warnings
+
+
+def check_https(url_data):
+    # Check whether the URL is valid
+    if not url_data.get("is_valid"):
+        return {
+            "rule": "HTTPS Check",
+            "flagged": False,
+            "message": "Cannot check an invalid URL."
+        }
+
+    # Check the URL protocol
+    if url_data["scheme"] == "http":
+        return {
+            "rule": "HTTPS Check",
+            "flagged": True,
+            "message": "URL uses HTTP instead of HTTPS."
+        }
+
+    return {
+        "rule": "HTTPS Check",
+        "flagged": False,
+        "message": "URL uses HTTPS. This does not guarantee legitimacy."
+    }
+
+
+
+
+def check_lookalike_domain(url_data):
+    if not url_data.get("is_valid"):
+        return []
+
+    hostname = url_data["hostname"].lower()
+
+    # Load trusted hostnames
+    trusted_hosts = load_trusted_domains()
+
+    if not trusted_hosts:
+        return []
+
+    # Do not flag trusted websites or their subdomains
+    for trusted_host in trusted_hosts:
+        if hostname == trusted_host or hostname.endswith("." + trusted_host):
+            return []
+
+    # Get the main brand labels from trusted domains
+    trusted_labels = set()
+
+    for trusted_host in trusted_hosts:
+        labels = trusted_host.split(".")
+
+        if labels[0] == "www" and len(labels) > 1:
+            labels = labels[1:]
+
+        brand = labels[0]
+
+        # Ignore very short names
+        if len(brand) >= 4:
+            trusted_labels.add(brand)
+
+    # Remove common hostname labels
+    ignored_labels = {
+        "www", "com", "net", "org", "gov",
+        "edu", "np", "login", "secure",
+        "account", "portal"
+    }
+
+    hostname_labels = hostname.split(".")
+
+    for label in hostname_labels:
+        if label in ignored_labels:
+            continue
+
+        # Check the complete label and hyphen-separated parts
+        label_parts = label.split("-")
+
+        for part in label_parts:
+            if len(part) < 4:
+                continue
+
+            for trusted_label in trusted_labels:
+                similarity = SequenceMatcher(
+                    None, part, trusted_label
+                ).ratio()
+
+                if similarity >= 0.80:
+                    return [
+                        "The domain may be impersonating a trusted website."
+                    ]
+
+    return []
