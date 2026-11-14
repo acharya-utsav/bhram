@@ -6,7 +6,8 @@ def calculate_risk(warnings):
         "The URL uses an IP address instead of a domain name.": 40,
         "The URL contains an @ symbol in its address.": 25,
         "The URL contains an unusually large number of domain parts.": 20,
-        "The URL is unusually long.": 10
+        "The URL is unusually long.": 10,
+        "The URL contains suspicious keywords often used in phishing attempts.": 10
     }
 
     for warning in warnings:

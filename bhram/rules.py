@@ -41,3 +41,25 @@ def check_url_structure(url_info):
         )
 
     return warnings
+
+def check_suspicious_keywords(url_info):
+    warnings = []
+
+    url = url_info["url"].lower()
+
+    suspicious_keywords = [
+        "login",
+        "verify",
+        "update",
+        "secure",
+        "bonus"
+    ]
+
+    for keyword in suspicious_keywords:
+        if keyword in url:
+            warnings.append(
+                "The URL contains suspicious keywords often used in phishing attempts."
+            )
+            break
+
+    return warnings
