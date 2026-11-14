@@ -90,6 +90,7 @@ def check_https(url_data):
     }
 
 
+
 def check_lookalike_domain(url_data):
     if not url_data.get("is_valid"):
         return []
@@ -100,60 +101,82 @@ def check_lookalike_domain(url_data):
     try:
         with open("data/trusted_domains.json", "r") as file:
             trusted_data = json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError):
+    except (OSError, json.JSONDecodeError):
         return []
 
     trusted_hosts = []
 
-    # Collect domains from the JSON file
+    # Collect trusted hostnames from the JSON file
     def collect_domains(data):
         for value in data.values():
             if isinstance(value, list):
                 for url in value:
+                    if not isinstance(url, str):
+                        continue
+
                     trusted_url = urlsplit(url)
+
                     if trusted_url.hostname:
-                        trusted_hosts.append(trusted_url.hostname.lower())
+                        trusted_hosts.append(
+                            trusted_url.hostname.lower()
+                        )
 
             elif isinstance(value, dict):
                 collect_domains(value)
 
+    if not isinstance(trusted_data, dict):
+        return []
+
     collect_domains(trusted_data)
 
-    # Do not flag a trusted domain or its subdomains
+    # Do not flag trusted websites or their subdomains
     for trusted_host in trusted_hosts:
         if hostname == trusted_host or hostname.endswith("." + trusted_host):
             return []
 
-    # Ignore common hostname labels
-    ignored_labels = [
-        "www", "com", "net", "org", "gov", "edu",
-        "np", "com.np", "org.np", "gov.np"
-    ]
-
-    hostname_labels = [
-        label for label in hostname.split(".")
-        if label not in ignored_labels
-    ]
-
-    trusted_labels = []
+    # Get the main brand labels from trusted domains
+    trusted_labels = set()
 
     for trusted_host in trusted_hosts:
         labels = trusted_host.split(".")
 
-        for label in labels:
-            if label != "www" and label not in ignored_labels:
-                trusted_labels.append(label)
+        if labels[0] == "www" and len(labels) > 1:
+            labels = labels[1:]
 
-    # Compare hostname labels with trusted domain labels
-    for hostname_label in hostname_labels:
-        for trusted_label in trusted_labels:
-            similarity = SequenceMatcher(
-                None, hostname_label, trusted_label
-            ).ratio()
+        brand = labels[0]
 
-            if similarity >= 0.80 and hostname_label != trusted_label:
-                return [
-                    "The domain may be impersonating a trusted website."
-                ]
+        # Ignore very short names because they can match by accident
+        if len(brand) >= 4:
+            trusted_labels.add(brand)
+
+    # Remove common hostname labels
+    ignored_labels = {
+        "www", "com", "net", "org", "gov",
+        "edu", "np", "login", "secure",
+        "account", "portal"
+    }
+
+    hostname_labels = hostname.split(".")
+
+    for label in hostname_labels:
+        if label in ignored_labels:
+            continue
+
+        # Check the complete label and parts separated by hyphens
+        label_parts = label.split("-")
+
+        for part in label_parts:
+            if len(part) < 4:
+                continue
+
+            for trusted_label in trusted_labels:
+                similarity = SequenceMatcher(
+                    None, part, trusted_label
+                ).ratio()
+
+                if similarity >= 0.80:
+                    return [
+                        "The domain may be impersonating a trusted website."
+                    ]
 
     return []
