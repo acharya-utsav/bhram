@@ -63,3 +63,27 @@ def check_suspicious_keywords(url_info):
             break
 
     return warnings
+
+
+def check_https(url_data):
+    # Check whether the URL is valid
+    if not url_data.get("is_valid"):
+        return {
+            "rule": "HTTPS Check",
+            "flagged": False,
+            "message": "Cannot check an invalid URL."
+        }
+
+    # Check the URL protocol
+    if url_data["scheme"] == "http":
+        return {
+            "rule": "HTTPS Check",
+            "flagged": True,
+            "message": "URL uses HTTP instead of HTTPS."
+        }
+
+    return {
+        "rule": "HTTPS Check",
+        "flagged": False,
+        "message": "URL uses HTTPS. This does not guarantee legitimacy."
+    }
