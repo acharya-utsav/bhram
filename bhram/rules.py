@@ -4,6 +4,7 @@ from difflib import SequenceMatcher
 from urllib.parse import urlsplit
 from functools import lru_cache
 
+
 @lru_cache(maxsize=1)
 def load_trusted_domains():
     # Load trusted domains from the JSON file
@@ -11,7 +12,16 @@ def load_trusted_domains():
         with open("data/trusted_domains.json", "r") as file:
             trusted_data = json.load(file)
 
-    except (OSError, json.JSONDecodeError):
+    except FileNotFoundError:
+        print("Error: Trusted domains file was not found.")
+        return []
+
+    except json.JSONDecodeError:
+        print("Error: Trusted domains JSON file is invalid.")
+        return []
+
+    except OSError as error:
+        print("Error loading trusted domains:", error)
         return []
 
     trusted_hosts = []
