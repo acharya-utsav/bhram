@@ -1,6 +1,11 @@
 from bhram.analyzer import analyze_url
-from bhram.rules import check_url_structure, check_suspicious_keywords, check_https
 from bhram.scorer import calculate_risk
+from bhram.rules import (
+    check_url_structure,
+    check_suspicious_keywords,
+    check_https,
+    check_lookalike_domain
+)
 
 def main():
     print("=" * 40)
@@ -32,8 +37,10 @@ def main():
 
     warnings = check_url_structure(result)
     keyword_warnings = check_suspicious_keywords(result)
+    lookalike_warnings = check_lookalike_domain(result)
 
     warnings.extend(keyword_warnings)
+    warnings.extend(lookalike_warnings)
 
     # Add HTTP warning to the risk assessment
     if https_result["flagged"]:
