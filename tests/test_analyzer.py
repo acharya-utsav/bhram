@@ -79,3 +79,40 @@ def test_ipv6_address_url():
 
     assert result["is_valid"] is True
     assert result["hostname"] == "2001:db8::1"
+
+def test_domain_starting_with_hyphen():
+    result = analyze_url("https://-example.com")
+
+    assert result["is_valid"] is False
+
+
+def test_domain_ending_with_hyphen():
+    result = analyze_url("https://example-.com")
+
+    assert result["is_valid"] is False
+
+
+def test_domain_with_underscore():
+    result = analyze_url("https://exam_ple.com")
+
+    assert result["is_valid"] is False
+
+
+def test_domain_label_too_long():
+    long_label = "a" * 64
+    result = analyze_url(f"https://{long_label}.com")
+
+    assert result["is_valid"] is False
+
+
+def test_domain_name_too_long():
+    long_domain = ".".join(["a" * 63] * 4)
+    result = analyze_url(f"https://{long_domain}")
+
+    assert result["is_valid"] is False
+
+
+def test_invalid_ipv4_address():
+    result = analyze_url("http://999.999.999.999")
+
+    assert result["is_valid"] is False
