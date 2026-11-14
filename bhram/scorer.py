@@ -12,7 +12,7 @@ def calculate_risk(warnings):
         "URL uses HTTP instead of HTTPS.": 10,
     }
 
-    for warning in warnings:
+    for warning in set(warnings):
         score += risk_points.get(warning, 0)
 
     # Keep the score within 0 to 100
