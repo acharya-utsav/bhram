@@ -2,7 +2,44 @@ import ipaddress
 import json
 from difflib import SequenceMatcher
 from urllib.parse import urlsplit
+from functools import lru_cache
 
+@lru_cache(maxsize=1)
+def load_trusted_domains():
+    # Load trusted domains from the JSON file
+    try:
+        with open("data/trusted_domains.json", "r") as file:
+            trusted_data = json.load(file)
+
+    except (OSError, json.JSONDecodeError):
+        return []
+
+    trusted_hosts = []
+
+    # Collect domains from the JSON file
+    def collect_domains(data):
+        for value in data.values():
+            if isinstance(value, list):
+                for url in value:
+                    if not isinstance(url, str):
+                        continue
+
+                    trusted_url = urlsplit(url)
+
+                    if trusted_url.hostname:
+                        trusted_hosts.append(
+                            trusted_url.hostname.lower()
+                        )
+
+            elif isinstance(value, dict):
+                collect_domains(value)
+
+    if not isinstance(trusted_data, dict):
+        return []
+
+    collect_domains(trusted_data)
+
+    return trusted_hosts
 
 def check_url_structure(url_info):
     warnings = []
@@ -91,43 +128,18 @@ def check_https(url_data):
 
 
 
+
 def check_lookalike_domain(url_data):
     if not url_data.get("is_valid"):
         return []
 
     hostname = url_data["hostname"].lower()
 
-    # Load trusted domains
-    try:
-        with open("data/trusted_domains.json", "r") as file:
-            trusted_data = json.load(file)
-    except (OSError, json.JSONDecodeError):
+    # Load trusted hostnames
+    trusted_hosts = load_trusted_domains()
+
+    if not trusted_hosts:
         return []
-
-    trusted_hosts = []
-
-    # Collect trusted hostnames from the JSON file
-    def collect_domains(data):
-        for value in data.values():
-            if isinstance(value, list):
-                for url in value:
-                    if not isinstance(url, str):
-                        continue
-
-                    trusted_url = urlsplit(url)
-
-                    if trusted_url.hostname:
-                        trusted_hosts.append(
-                            trusted_url.hostname.lower()
-                        )
-
-            elif isinstance(value, dict):
-                collect_domains(value)
-
-    if not isinstance(trusted_data, dict):
-        return []
-
-    collect_domains(trusted_data)
 
     # Do not flag trusted websites or their subdomains
     for trusted_host in trusted_hosts:
@@ -145,7 +157,7 @@ def check_lookalike_domain(url_data):
 
         brand = labels[0]
 
-        # Ignore very short names because they can match by accident
+        # Ignore very short names
         if len(brand) >= 4:
             trusted_labels.add(brand)
 
@@ -162,7 +174,7 @@ def check_lookalike_domain(url_data):
         if label in ignored_labels:
             continue
 
-        # Check the complete label and parts separated by hyphens
+        # Check the complete label and hyphen-separated parts
         label_parts = label.split("-")
 
         for part in label_parts:
